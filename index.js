@@ -15,12 +15,17 @@ const app = {};
 
 // testing file system
 // @TODO: will clear later
+
 // data.create('test', 'newFile', { name: 'Bangladesh', language: 'Bangla' }, (err) => {
 //     console.log('error was ', err);
 // });
 
-data.read('test', 'newFile', (err, data) => {
-    console.log(err, data);
+// data.read('test', 'newFile', (err, data) => {
+//     console.log(err, data);
+// });
+
+data.update('test', 'newFile', { name: 'England', language: 'English' }, (err) => {
+    console.log(err);
 });
 
 // configuration
