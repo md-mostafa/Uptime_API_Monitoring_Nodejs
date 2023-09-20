@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /*
  * Title: Handle Request, Response
  * Description: Handle Request and Response
@@ -52,11 +53,10 @@ handler.handleReqRes = (req, res) => {
             const payloadString = JSON.stringify(payload);
 
             // return final response;
+            res.setHeader('Content-Type', 'application/json');
             res.writeHead(statusCode);
             res.end(payloadString);
         });
-        // response handle
-        res.end('Hello Mostafa!');
     });
 };
 

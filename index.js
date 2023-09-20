@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /*
  * Title: Uptime Monitoring Application
  * Description: A RESTFul API to monitor up or down time of user defined links
@@ -16,9 +17,9 @@ const app = {};
 // testing file system
 // @TODO: will clear later
 
-data.create('test', 'newFile', { name: 'Bangladesh', language: 'Bangla' }, (err) => {
-    console.log('error was ', err);
-});
+// data.create('test', 'newFile', { name: 'Bangladesh', language: 'Bangla' }, (err) => {
+//     console.log('error was ', err);
+// });
 
 // data.read('test', 'newFile', (err, data) => {
 //     console.log(err, data);
@@ -28,9 +29,9 @@ data.create('test', 'newFile', { name: 'Bangladesh', language: 'Bangla' }, (err)
 //     console.log(err);
 // });
 
-data.delete('test', 'newFile', (err) => {
-    console.log(err);
-});
+// data.delete('test', 'newFile', (err) => {
+//     console.log(err);
+// });
 
 // configuration
 app.config = {};
