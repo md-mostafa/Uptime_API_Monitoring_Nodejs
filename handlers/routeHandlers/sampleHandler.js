@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /*
  * Title: Sample Handler
  * Description: Sample Handler
