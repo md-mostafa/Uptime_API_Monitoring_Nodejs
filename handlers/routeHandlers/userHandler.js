@@ -65,6 +65,7 @@ handler._users.post = (requestProperties, callBack) => {
     }
 };
 
+// @TODO: Authentication
 handler._users.get = (requestProperties, callBack) => {
     // check the phone number is valid
     const phone = typeof requestProperties.queryStringObj.phone === 'string' && requestProperties.queryStringObj.phone.trim().length === 11 ? requestProperties.queryStringObj.phone : false;
@@ -91,6 +92,7 @@ handler._users.get = (requestProperties, callBack) => {
     }
 };
 
+// @TODO: Authentication
 handler._users.put = (requestProperties, callBack) => {
     const firstName = typeof requestProperties.body.firstName === 'string' && requestProperties.body.firstName.trim().length > 0 ? requestProperties.body.firstName : false;
     const lastName = typeof requestProperties.body.lastName === 'string' && requestProperties.body.lastName.trim().length > 0 ? requestProperties.body.lastName : false;
@@ -145,8 +147,36 @@ handler._users.put = (requestProperties, callBack) => {
     }
 };
 
+// @TODO: Authentication
 handler._users.delete = (requestProperties, callBack) => {
+    const phone = typeof requestProperties.queryStringObj.phone === 'string' && requestProperties.queryStringObj.phone.trim().length === 11 ? requestProperties.queryStringObj.phone : false;
 
+    if (phone) {
+        // lookup
+        data.read('users', phone, (err, userData) => {
+            if (!err && userData) {
+                data.delete('users', phone, (err1) => {
+                    if (!err1) {
+                        callBack(200, {
+                            message: 'User was succesfully deleted',
+                        });
+                    } else {
+                        callBack(500, {
+                            error: 'There was a server side error',
+                        });
+                    }
+                });
+            } else {
+                callBack(500, {
+                    error: 'There was a server side error',
+                });
+            }
+        });
+    } else {
+        callBack(400, {
+            error: 'There was a problem in your request!',
+        });
+    }
 };
 
 module.exports = handler;
