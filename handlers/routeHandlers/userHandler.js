@@ -9,6 +9,7 @@
 // dependencies
 const data = require('../../lib/data');
 const { hash, parseJSON } = require('../../helpers/utils');
+const tokenHandler = require('./tokenHandler');
 
 // module scaffolding
 const handler = {};
@@ -65,24 +66,29 @@ handler._users.post = (requestProperties, callBack) => {
     }
 };
 
-// @TODO: Authentication
 handler._users.get = (requestProperties, callBack) => {
     // check the phone number is valid
     const phone = typeof requestProperties.queryStringObj.phone === 'string' && requestProperties.queryStringObj.phone.trim().length === 11 ? requestProperties.queryStringObj.phone : false;
     if (phone) {
-        // lookup the user
-        data.read('users', phone, (err, user) => {
-            const parsedUser = { ...parseJSON(user) };
-            /*
-                { name : 'something', age : 23, gender: 'male'}
-            */
-            if (!err && parsedUser) {
-                delete parsedUser.password;
-                callBack(200, parsedUser);
-            } else {
-                callBack(404, {
-                    error: 'Requested user not found',
+        // verify the token
+        const token = typeof requestProperties.headersObj.token === 'string' ? requestProperties.headersObj.token : false;
+
+        tokenHandler._token.verify(token, phone, (tokenId) => {
+            if (tokenId) {
+                 // lookup the user
+                data.read('users', phone, (err, user) => {
+                    const parsedUser = { ...parseJSON(user) };
+                    if (!err && parsedUser) {
+                        delete parsedUser.password;
+                        callBack(200, parsedUser);
+                    } else {
+                        callBack(404, {
+                            error: 'Requested user not found',
+                        });
+                    }
                 });
+            } else {
+                callBack(403, { error: 'Authentication failed!' });
             }
         });
     } else {
@@ -92,7 +98,6 @@ handler._users.get = (requestProperties, callBack) => {
     }
 };
 
-// @TODO: Authentication
 handler._users.put = (requestProperties, callBack) => {
     const firstName = typeof requestProperties.body.firstName === 'string' && requestProperties.body.firstName.trim().length > 0 ? requestProperties.body.firstName : false;
     const lastName = typeof requestProperties.body.lastName === 'string' && requestProperties.body.lastName.trim().length > 0 ? requestProperties.body.lastName : false;
@@ -101,38 +106,46 @@ handler._users.put = (requestProperties, callBack) => {
 
     if (phone) {
         if (firstName || lastName || password) {
-            // lookup the user
-            data.read('users', phone, (err, uData) => {
-                const userData = { ...parseJSON(uData) };
-                if (!err && userData) {
-                    if (firstName) {
-                        userData.firstName = firstName;
-                    }
+            // verify the token
+            const token = typeof requestProperties.headersObj.token === 'string' ? requestProperties.headersObj.token : false;
+            tokenHandler._token.verify(token, phone, (tokenId) => {
+                if (tokenId) {
+                    // lookup the user
+                    data.read('users', phone, (err, uData) => {
+                        const userData = { ...parseJSON(uData) };
+                        if (!err && userData) {
+                            if (firstName) {
+                                userData.firstName = firstName;
+                            }
 
-                    if (lastName) {
-                        userData.lastName = lastName;
-                    }
+                            if (lastName) {
+                                userData.lastName = lastName;
+                            }
 
-                    if (password) {
-                        userData.password = hash(password);
-                    }
+                            if (password) {
+                                userData.password = hash(password);
+                            }
 
-                    // store to database
-                    data.update('users', phone, userData, (err2) => {
-                        if (!err2) {
-                            callBack(200, {
-                                message: 'User was updated successfully',
+                            // store to database
+                            data.update('users', phone, userData, (err2) => {
+                                if (!err2) {
+                                    callBack(200, {
+                                        message: 'User was updated successfully',
+                                    });
+                                } else {
+                                    callBack(500, {
+                                        error: 'There was a problem in the server side!',
+                                    });
+                                }
                             });
                         } else {
-                            callBack(500, {
-                                error: 'There was a problem in the server side!',
+                            callBack(400, {
+                                error: 'You have a problem in your request!',
                             });
                         }
                     });
                 } else {
-                    callBack(400, {
-                        error: 'You have a problem in your request!',
-                    });
+                    callBack(403, { error: 'Authentication failure' });
                 }
             });
         } else {
