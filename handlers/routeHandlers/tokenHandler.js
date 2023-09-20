@@ -27,11 +27,13 @@ handler._token = {};
 handler._token.post = (requestProperties, callBack) => {
     const phone = typeof requestProperties.body.phone === 'string' && requestProperties.body.phone.trim().length === 11 ? requestProperties.body.phone : false;
     const password = typeof requestProperties.body.password === 'string' && requestProperties.body.password.trim().length > 0 ? requestProperties.body.password : false;
+
     if (phone && password) {
         data.read('users', phone, (err1, userData) => {
             const hashedPassword = hash(password);
             if (hashedPassword === parseJSON(userData).password) {
                 const tokenId = createRandomString(20);
+                console.log(tokenId);
                 const expires = Date.now() + 3600 * 1000;
                 const tokenObject = {
                     phone,
@@ -58,9 +60,22 @@ handler._token.post = (requestProperties, callBack) => {
     }
 };
 
-// @TODO: Authentication
 handler._token.get = (requestProperties, callBack) => {
-
+        // check whether the id is valid
+        const id = typeof requestProperties.queryStringObj.id === 'string' && requestProperties.queryStringObj.id.trim().length === 20 ? requestProperties.queryStringObj.id : false;
+        if (id) {
+            // lookup the token
+            data.read('tokens', id, (err, tokenData) => {
+                const parsedToken = { ...parseJSON(tokenData) };
+                if (!err && parsedToken) {
+                    callBack(200, parsedToken);
+                } else {
+                    callBack(404, { error: 'Requested token not found' });
+                }
+            });
+        } else {
+            callBack(404, { error: 'Requested token not found' });
+        }
 };
 
 // @TODO: Authentication
