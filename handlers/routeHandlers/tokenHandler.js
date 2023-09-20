@@ -78,7 +78,6 @@ handler._token.get = (requestProperties, callBack) => {
         }
 };
 
-// @TODO: Authentication
 handler._token.put = (requestProperties, callBack) => {
     const id = typeof requestProperties.body.id === 'string' && requestProperties.body.id.trim().length === 20 ? requestProperties.body.id : false;
     const extend = !!(typeof requestProperties.body.extend === 'boolean' && requestProperties.body.extend === true);
@@ -107,8 +106,36 @@ handler._token.put = (requestProperties, callBack) => {
     }
 };
 
-// @TODO: Authentication
 handler._token.delete = (requestProperties, callBack) => {
+    // check whether the token is valid
+    const id = typeof requestProperties.queryStringObj.id === 'string' && requestProperties.queryStringObj.id.trim().length === 20 ? requestProperties.queryStringObj.id : false;
+
+    if (id) {
+        // lookup the id
+        data.read('tokens', id, (err1, tokenData) => {
+            if (!err1 && tokenData) {
+                data.delete('tokens', id, (err2) => {
+                    if (!err2) {
+                        callBack(200, {
+                            message: 'Token was successfully deleted',
+                        });
+                    } else {
+                        callBack(500, {
+                            error: 'There was a server side error',
+                        });
+                    }
+                });
+            } else {
+                callBack(500, {
+                    error: 'There was a server side error',
+                });
+            }
+        });
+    } else {
+        callBack(400, {
+            error: 'There was a problem in your request!',
+        });
+    }
 };
 
 module.exports = handler;
