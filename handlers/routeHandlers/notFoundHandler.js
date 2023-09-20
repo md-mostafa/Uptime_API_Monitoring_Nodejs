@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /*
  * Title: Not Found Handler
  * Description: 404 Not Found Handler
