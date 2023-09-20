@@ -80,7 +80,31 @@ handler._token.get = (requestProperties, callBack) => {
 
 // @TODO: Authentication
 handler._token.put = (requestProperties, callBack) => {
+    const id = typeof requestProperties.body.id === 'string' && requestProperties.body.id.trim().length === 20 ? requestProperties.body.id : false;
+    const extend = !!(typeof requestProperties.body.extend === 'boolean' && requestProperties.body.extend === true);
 
+    if (id && extend) {
+        data.read('tokens', id, (err1, tokenData) => {
+            const tokenObject = parseJSON(tokenData);
+
+            if (tokenObject.expires > Date.now()) {
+                tokenObject.expires = Date.now() + 60 * 60 * 1000;
+
+                // store the updated token
+                data.update('tokens', id, tokenObject, (err2) => {
+                    if (!err2) {
+                        callBack(200);
+                    } else {
+                        callBack(500, { error: 'There was a server side error!' });
+                    }
+                });
+            } else {
+                callBack(400, { error: 'Token already expired!' });
+            }
+        });
+    } else {
+        callBack(400, { error: 'There was a problem in your request' });
+    }
 };
 
 // @TODO: Authentication
