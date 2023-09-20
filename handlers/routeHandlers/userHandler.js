@@ -160,18 +160,28 @@ handler._users.put = (requestProperties, callBack) => {
     }
 };
 
-// @TODO: Authentication
 handler._users.delete = (requestProperties, callBack) => {
     const phone = typeof requestProperties.queryStringObj.phone === 'string' && requestProperties.queryStringObj.phone.trim().length === 11 ? requestProperties.queryStringObj.phone : false;
 
     if (phone) {
-        // lookup
-        data.read('users', phone, (err, userData) => {
-            if (!err && userData) {
-                data.delete('users', phone, (err1) => {
-                    if (!err1) {
-                        callBack(200, {
-                            message: 'User was succesfully deleted',
+        // verify the token
+        const token = typeof requestProperties.headersObj.token === 'string' ? requestProperties.headersObj.token : false;
+
+        tokenHandler._token.verify(token, phone, (tokenId) => {
+            if (tokenId) {
+                // lookup the user
+                data.read('users', phone, (err, userData) => {
+                    if (!err && userData) {
+                        data.delete('users', phone, (err1) => {
+                            if (!err1) {
+                                callBack(200, {
+                                    message: 'User was successfully deleted',
+                                });
+                            } else {
+                                callBack(500, {
+                                    error: 'There was a server side error',
+                                });
+                            }
                         });
                     } else {
                         callBack(500, {
@@ -180,9 +190,7 @@ handler._users.delete = (requestProperties, callBack) => {
                     }
                 });
             } else {
-                callBack(500, {
-                    error: 'There was a server side error',
-                });
+                callBack(403, { error: 'Authentication failure' });
             }
         });
     } else {
