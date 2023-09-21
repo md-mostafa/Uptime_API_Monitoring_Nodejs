@@ -62,7 +62,7 @@ handler._token.post = (requestProperties, callBack) => {
 
 handler._token.get = (requestProperties, callBack) => {
         // check whether the id is valid
-        const id = typeof requestProperties.queryStringObj.id === 'string' && requestProperties.queryStringObj.id.trim().length === 20 ? requestProperties.queryStringObj.id : false;
+        const id = typeof requestProperties.queryStringObject.id === 'string' && requestProperties.queryStringObject.id.trim().length === 20 ? requestProperties.queryStringObject.id : false;
         if (id) {
             // lookup the token
             data.read('tokens', id, (err, tokenData) => {
@@ -108,7 +108,7 @@ handler._token.put = (requestProperties, callBack) => {
 
 handler._token.delete = (requestProperties, callBack) => {
     // check whether the token is valid
-    const id = typeof requestProperties.queryStringObj.id === 'string' && requestProperties.queryStringObj.id.trim().length === 20 ? requestProperties.queryStringObj.id : false;
+    const id = typeof requestProperties.queryStringObject.id === 'string' && requestProperties.queryStringObject.id.trim().length === 20 ? requestProperties.queryStringObject.id : false;
 
     if (id) {
         // lookup the id

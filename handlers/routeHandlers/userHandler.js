@@ -68,10 +68,10 @@ handler._users.post = (requestProperties, callBack) => {
 
 handler._users.get = (requestProperties, callBack) => {
     // check the phone number is valid
-    const phone = typeof requestProperties.queryStringObj.phone === 'string' && requestProperties.queryStringObj.phone.trim().length === 11 ? requestProperties.queryStringObj.phone : false;
+    const phone = typeof requestProperties.queryStringObject.phone === 'string' && requestProperties.queryStringObject.phone.trim().length === 11 ? requestProperties.queryStringObject.phone : false;
     if (phone) {
         // verify the token
-        const token = typeof requestProperties.headersObj.token === 'string' ? requestProperties.headersObj.token : false;
+        const token = typeof requestProperties.headersObject.token === 'string' ? requestProperties.headersObject.token : false;
 
         tokenHandler._token.verify(token, phone, (tokenId) => {
             if (tokenId) {
@@ -107,7 +107,7 @@ handler._users.put = (requestProperties, callBack) => {
     if (phone) {
         if (firstName || lastName || password) {
             // verify the token
-            const token = typeof requestProperties.headersObj.token === 'string' ? requestProperties.headersObj.token : false;
+            const token = typeof requestProperties.headersObject.token === 'string' ? requestProperties.headersObject.token : false;
             tokenHandler._token.verify(token, phone, (tokenId) => {
                 if (tokenId) {
                     // lookup the user
@@ -161,11 +161,11 @@ handler._users.put = (requestProperties, callBack) => {
 };
 
 handler._users.delete = (requestProperties, callBack) => {
-    const phone = typeof requestProperties.queryStringObj.phone === 'string' && requestProperties.queryStringObj.phone.trim().length === 11 ? requestProperties.queryStringObj.phone : false;
+    const phone = typeof requestProperties.queryStringObject.phone === 'string' && requestProperties.queryStringObject.phone.trim().length === 11 ? requestProperties.queryStringObject.phone : false;
 
     if (phone) {
         // verify the token
-        const token = typeof requestProperties.headersObj.token === 'string' ? requestProperties.headersObj.token : false;
+        const token = typeof requestProperties.headersObject.token === 'string' ? requestProperties.headersObject.token : false;
 
         tokenHandler._token.verify(token, phone, (tokenId) => {
             if (tokenId) {

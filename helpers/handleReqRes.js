@@ -1,38 +1,37 @@
-/* eslint-disable prettier/prettier */
 /*
- * Title: Handle Request, Response
- * Description: Handle Request and Response
+ * Title: Handle Request Response
+ * Description: Handle request and response
  * Author: Md Mostafa
+ *
  */
 
 // dependencies
-
 const url = require('url');
 const { StringDecoder } = require('string_decoder');
 const routes = require('../routes');
 const { notFoundHandler } = require('../handlers/routeHandlers/notFoundHandler');
 const { parseJSON } = require('./utils');
 
-// Module scaffolding;
+// module scaffolding
 const handler = {};
 
 handler.handleReqRes = (req, res) => {
-    // Request handling
-    // Parsing the url
+    // request handling
+    // get the url and parse it
     const parsedUrl = url.parse(req.url, true);
     const path = parsedUrl.pathname;
     const trimmedPath = path.replace(/^\/+|\/+$/g, '');
     const method = req.method.toLowerCase();
-    const queryStringObj = parsedUrl.query;
-    const headersObj = req.headers;
+    const queryStringObject = parsedUrl.query;
+    const headersObject = req.headers;
 
     const requestProperties = {
         parsedUrl,
         path,
         trimmedPath,
         method,
-        queryStringObj,
-        headersObj,
+        queryStringObject,
+        headersObject,
     };
 
     const decoder = new StringDecoder('utf-8');
@@ -46,6 +45,7 @@ handler.handleReqRes = (req, res) => {
 
     req.on('end', () => {
         realData += decoder.end();
+
         requestProperties.body = parseJSON(realData);
 
         chosenHandler(requestProperties, (statusCode, payload) => {
@@ -54,7 +54,7 @@ handler.handleReqRes = (req, res) => {
 
             const payloadString = JSON.stringify(payload);
 
-            // return final response;
+            // return the final response
             res.setHeader('Content-Type', 'application/json');
             res.writeHead(statusCode);
             res.end(payloadString);
