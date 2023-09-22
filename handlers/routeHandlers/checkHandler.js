@@ -99,16 +99,11 @@ handler._check.post = (requestProperties, callback) => {
                                                     // return the data about the new check
                                                     callback(200, checkObject);
                                                 } else {
-                                                    callback(500, {
-                                                        error:
-                                                            'There was a problem in the server side!',
-                                                    });
+                                                    callback(500, { error: 'There was a problem in the server side!' });
                                                 }
                                             });
                                         } else {
-                                            callback(500, {
-                                                error: 'There was a problem in the server side!',
-                                            });
+                                            callback(500, { error: 'There was a problem in the server side!' });
                                         }
                                     });
                                 } else {
