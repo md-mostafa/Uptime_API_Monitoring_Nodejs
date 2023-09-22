@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable prettier/prettier */
 /*
@@ -126,22 +127,44 @@ handler._check.post = (requestProperties, callback) => {
     }
 };
 
-handler._check.get = (requestProperties, callBack) => {
-    // check the phone number is valid
-    const phone = typeof requestProperties.queryStringObject.phone === 'string' && requestProperties.queryStringObject.phone.trim().length === 11 ? requestProperties.queryStringObject.phone : false;
+handler._check.get = (requestProperties, callback) => {
+    // check whether id is valid
+    const id = typeof requestProperties.queryStringObject.id === 'string' && requestProperties.queryStringObject.id.trim().length === 20 ? requestProperties.queryStringObject.id : false;
 
+    if (id) {
+        // lookup the check
+        data.read('checks', id, (err, checkData) => {
+            if (!err && checkData) {
+                const token = typeof requestProperties.headersObject.token === 'string'
+                ? requestProperties.headersObject.token
+                : false;
+
+                tokenHandler._token.verify(token, parseJSON(checkData).userPhone, (tokenIsValid) => {
+                    if (tokenIsValid) {
+                        callback(200, parseJSON(checkData));
+                    } else {
+                        callback(403, { error: 'Authentication failure!' });
+                    }
+                });
+            } else {
+                callback(500, { error: 'There was a problem in the server side' });
+            }
+        });
+    } else {
+        callback(400, { error: 'You have a problem in your request' });
+    }
 };
 
-handler._check.put = (requestProperties, callBack) => {
-    const firstName = typeof requestProperties.body.firstName === 'string' && requestProperties.body.firstName.trim().length > 0 ? requestProperties.body.firstName : false;
-    const lastName = typeof requestProperties.body.lastName === 'string' && requestProperties.body.lastName.trim().length > 0 ? requestProperties.body.lastName : false;
-    const phone = typeof requestProperties.body.phone === 'string' && requestProperties.body.phone.trim().length === 11 ? requestProperties.body.phone : false;
-    const password = typeof requestProperties.body.password === 'string' && requestProperties.body.password.trim().length > 0 ? requestProperties.body.password : false;
-};
+// handler._check.put = (requestProperties, callBack) => {
+//     const firstName = typeof requestProperties.body.firstName === 'string' && requestProperties.body.firstName.trim().length > 0 ? requestProperties.body.firstName : false;
+//     const lastName = typeof requestProperties.body.lastName === 'string' && requestProperties.body.lastName.trim().length > 0 ? requestProperties.body.lastName : false;
+//     const phone = typeof requestProperties.body.phone === 'string' && requestProperties.body.phone.trim().length === 11 ? requestProperties.body.phone : false;
+//     const password = typeof requestProperties.body.password === 'string' && requestProperties.body.password.trim().length > 0 ? requestProperties.body.password : false;
+// };
 
-handler._check.delete = (requestProperties, callBack) => {
-    const phone = typeof requestProperties.queryStringObject.phone === 'string' && requestProperties.queryStringObject.phone.trim().length === 11 ? requestProperties.queryStringObject.phone : false;
+// handler._check.delete = (requestProperties, callBack) => {
+//     const phone = typeof requestProperties.queryStringObject.phone === 'string' && requestProperties.queryStringObject.phone.trim().length === 11 ? requestProperties.queryStringObject.phone : false;
 
-};
+// };
 
 module.exports = handler;
