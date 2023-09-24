@@ -1,3 +1,6 @@
 node_modules
 .vscode
-.data
+
+# Ignore all files in subfolders except JSON files
+.data/*/*
+!*.json
